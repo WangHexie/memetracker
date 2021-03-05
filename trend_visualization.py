@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def draw_trend(count_result:dict):
+def draw_trend(count_result: dict):
     sns.set_theme(style="whitegrid")
 
     # Load the diamonds dataset
@@ -14,10 +14,9 @@ def draw_trend(count_result:dict):
     # print(diamonds["x"])
     diamonds.set_index(["x"], inplace=True)
 
-
     # sns.lineplot(data=diamonds, palette="tab10", linewidth=2.5)
 
-    sns.displot(data=diamonds, palette="tab10",  kind="kde")
+    sns.displot(data=diamonds, palette="tab10", kind="kde")
     plt.show()
 
     # Plot the distribution of clarity ratings, conditional on carat
@@ -30,16 +29,27 @@ def draw_trend(count_result:dict):
     # )
 
 
-def draw_multiple_trend(count_result:List[dict], memes:List[str]):
+def draw_multiple_trend(count_result: List[dict], memes: List[str]):
     sns.set_theme(style="whitegrid")
 
-    time = list(count_result[0].keys())
+    data_dict = {"time":[], "meme":[], "count":[]}
+    for count, meme in zip(count_result, memes):
+        data_dict["time"] += list(count.keys())
+        data_dict["meme"] += [meme] * len(list(count.keys()))
+        data_dict["count"] += list(count.values())
 
-    
+    diamonds = pd.DataFrame(data_dict)
 
-    diamonds = pd.DataFrame(list(zip(list(count_result.keys()), list(count_result.values()))), columns=["x", "y"])
+    # # diamonds.set_index(["x"], inplace=True)
+    # data_wide = diamonds.pivot(index="time", columns="meme", values="count")
+    # # sns.displot(data=flights_wide, palette="tab10", kind="kde")
+    # sns.displot(data=diamonds,x="time", y="count",hue="meme", palette="tab10", kind="kde")
+    # plt.show()
 
-    diamonds.set_index(["x"], inplace=True)
+    a4_dims = (15.7, 8.27)
+    from matplotlib import pyplot
 
-    sns.displot(data=diamonds, palette="tab10",  kind="kde")
+    fig, ax = pyplot.subplots(figsize=a4_dims)
+
+    sns.lineplot(ax=ax, data=diamonds,x="time", y="count",hue="meme", sizes=(40,10))
     plt.show()

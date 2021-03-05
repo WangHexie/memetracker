@@ -3,16 +3,16 @@ from tqdm import tqdm
 from config import mode
 import pandas as pd
 
+
 class Dataset:
-    def __init__(self, path, max_unit):
+    def __init__(self, path, time_span="1h"):
         """
         self.data = List[dict("P", "T", "Q", "L")]
         :param path:
         :param max_unit:
         """
         self.path = path
-        self.max_unit = max_unit
-
+        self.time_span = time_span
         self.data: List[dict] = []
 
     @staticmethod
@@ -34,7 +34,7 @@ class Dataset:
     def build_from_one_file(self, path):
         with open(path, "r", encoding="utf-8") as f:
             if mode == "test":
-                data = f.read(1000000)
+                data = f.read(1000000000)
             else:
                 data = f.read()
 
@@ -67,13 +67,34 @@ class Dataset:
 
     def statics_of_quoted_data(self):
         df = self.output_quoted_data_with_time()
-        result = df.groupby([pd.Grouper(key="time", freq="1min"), "quoted"]).size()
+        result = df.groupby([pd.Grouper(key="time", freq=self.time_span), "quoted"]).size()
         return result
 
 
-def filter_data(data:List[str]):
+def delete_too_short_phrase(data: pd.DataFrame, min_length=4):
+    string_length = data["str"].map(lambda x: len(x.split()))
+    return data[string_length > min_length]
+
+
+def delete_meaningless_gt(data: pd.DataFrame, str_to_exclude=" gt "):
+    string_length = data["str"].map(lambda x: str_to_exclude not in x)
+    return data[string_length.values]
+
+
+def delete_uncommon_phrase(data: pd.DataFrame, min_occurrence=10):
+    counts = data["str"].value_counts()
+    # TODO: bug warning!!!!. return a series, not dataframe ,
+    return counts[counts.values > min_occurrence]
+
+
+def filter_data(data: List[str]):
     data_df = pd.DataFrame(data, columns=["str"])
-    counts = data_df["str"].value_counts()
+
+    data_df = delete_too_short_phrase(data_df)
+    data_df = delete_meaningless_gt(data_df)
+    data_df = delete_uncommon_phrase(data_df)
+    # counts = data_df["str"].value_counts()
+    counts = data_df
     return counts.index.tolist()
 
 
