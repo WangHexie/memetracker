@@ -1,7 +1,6 @@
 \.idea/
 .idea/
 __pycache__/
-*.png
 transactions.csv
 ./data/
 *.py[cod]
@@ -32,7 +31,6 @@ deep_learning/model.h5
 *.npz
 *.data
 *.dat
-*.png
 one_time_use/.ipynb_checkpoints/*
 train_dict
 *.npy

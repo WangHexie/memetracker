@@ -17,6 +17,7 @@ def draw_trend(count_result: dict):
     # sns.lineplot(data=diamonds, palette="tab10", linewidth=2.5)
 
     sns.displot(data=diamonds, palette="tab10", kind="kde")
+
     plt.show()
 
     # Plot the distribution of clarity ratings, conditional on carat
